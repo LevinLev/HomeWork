@@ -53,7 +53,6 @@ def print_words(filename):
 
 def print_top(filename):
     dic = make_dic(filename)
-    i = 0
     for word in sorted(dic, key = dic.get, reverse = True)[:20]:
         print(word, dic[word])
 
