@@ -35,7 +35,7 @@ def read_words(filename):
 # and builds and returns a word/count dict for it.
 # Then print_words() and print_top() can just call the utility function.
 
-def print_words(filename):
+def make_dic(filename):
     words = real_words(filename)
     dic = {}
     for word in words:
@@ -43,21 +43,20 @@ def print_words(filename):
             dic[word] += 1
         else:
             dic[word] = 1;
+    return dic
+
+def print_words(filename):
+    dic = make_dic(filename)
+    sorted(dic)
     for key in dic:
-        print(key, " ", dic[key])
+        print(key, dic[key])
         
 
 def print_top(filename):
-    words = real_words(filename)
-    dic = {}
-    for word in words:
-        if word in dic:
-            dic[word] += 1
-        else:
-            dic[word] = 1;
-    i = 0;
+    dic = make_dic(filename)
+    i = 0
     for word in sorted(dic, key = dic.get, reverse = True):
-        print(word, " ", dic[word])
+        print(word, dic[word])
         i += 1
         if i == 20:
             break

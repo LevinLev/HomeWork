@@ -26,14 +26,10 @@ def verbing(s):
 # Example input: 'This dinner is not that bad!'
 # Example output: 'This dinner is good!'
 def not_bad(s):
-    NOT = s.find('not')
-    BAD = s.find('bad')
-    if NOT == -1:
+    no = s.find('not')
+    bad = s.find('bad')
+    if no == -1 || bad == -1 || bad < no:
         string = s
-    elif BAD == -1:
-        string = s
-    elif BAD > NOT:
-        string = s[:NOT] + "good" + s[BAD + 3:]
     else:
         string = s
     return string
@@ -50,12 +46,6 @@ def not_bad(s):
 # Example input: 'abcd', 'xy'
 # Example output: 'abxcdy'
 def front_back(a, b):
-    if len(a) % 2 == 0:
-        A = int(len(a) / 2)
-    else:
-        A = int(len(a) / 2 + 1)
-    if len(b) % 2 == 0:
-        B = int(len(b) / 2)
-    else:
-        B = int(len(b) / 2 + 1)
-    return a[:A] + b[:B] + a[A:] + b[B:]
+    A = len(a) // 2
+    B = len(b) // 2
+    return a[:-A] + b[:-B] + a[-A:] + b[-B:]
