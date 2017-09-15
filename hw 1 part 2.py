@@ -11,7 +11,7 @@ def verbing(s):
     if len(s) < 3:
         string = s
     elif s[-3:] == 'ing':
-        string = s[0: len(s) - 3] + 'ly'
+        string = s + 'ly'
     else:
         string = s + 'ing'
     return string
@@ -31,7 +31,7 @@ def not_bad(s):
     if no == -1 || bad == -1 || bad < no:
         string = s
     else:
-        string = s
+        string = s[:NOT] + "good" + s[BAD + 3:]
     return string
 
 

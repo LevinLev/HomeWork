@@ -47,18 +47,15 @@ def make_dic(filename):
 
 def print_words(filename):
     dic = make_dic(filename)
-    sorted(dic)
-    for key in dic:
+    for key in sorted(dic):
         print(key, dic[key])
         
 
 def print_top(filename):
     dic = make_dic(filename)
     i = 0
-    for word in sorted(dic, key = dic.get, reverse = True):
+    for word in sorted(dic, key = dic.get, reverse = True)[:20]:
         print(word, dic[word])
-        i += 1
-        if i == 20:
             break
 
 # This basic command line argument parsing code is provided and
