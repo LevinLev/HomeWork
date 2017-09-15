@@ -28,10 +28,10 @@ def verbing(s):
 def not_bad(s):
     no = s.find('not')
     bad = s.find('bad')
-    if no == -1 || bad == -1 || bad < no:
+    if no == -1 or bad == -1 or bad < no:
         string = s
     else:
-        string = s[:NOT] + "good" + s[BAD + 3:]
+        string = s[:no] + "good" + s[bad + 3:]
     return string
 
 

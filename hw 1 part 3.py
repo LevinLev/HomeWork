@@ -56,7 +56,6 @@ def print_top(filename):
     i = 0
     for word in sorted(dic, key = dic.get, reverse = True)[:20]:
         print(word, dic[word])
-            break
 
 # This basic command line argument parsing code is provided and
 # calls the print_words() and print_top() functions which you must define.
