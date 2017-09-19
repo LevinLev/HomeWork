@@ -4,7 +4,7 @@ from os import path
 from hashlib import sha1 as hasher
 
 def getHash(direct):
-    with open(direct, 'rb') as file:
+    with open(direct, 'rb') as f:
         hasher = hasher()
         part = f.read(1024) #why not?
         while len(part):
