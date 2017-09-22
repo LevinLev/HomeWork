@@ -5,25 +5,32 @@ from hashlib import sha1 as hasher
 
 def getHash(direct):
     with open(direct, 'rb') as f:
-        hasher = hasher()
-        part = f.read(1024) #why not?
+        hashe = hasher()
+        part = f.read(2048) #optimal desigion for my comp.
         while len(part):
-            hasher.update(part)
-            part = f.read(1024)
-    return hasher.digest()
+            hashe.update(part)
+            part = f.read(2048)
+    return hashe.digest()
 
 def getDic(root):
     tree = walk(root)
     dic = {}
+    hsh = " "
     for branch, _, leaves in tree:
-        for leave in leaves:
-            if leave[0] != "." and leave[0] != "~":
-                broom = branch + leave
-                dic[getHash(broom)].append(leave) 
+        if os.path.islink(branch) == 0:
+            for leave in leaves:
+                if leave[0] != "." and leave[0] != "~":
+                    broom = branch + '/' + leave
+                    hsh = getHash(broom)
+                    if hsh in dic:
+                        dic[hsh].append(leave)
+                    else:
+                        dic[hsh] = []
+                        dic[hsh].append(leave)
     return dic
 
 if __name__ == "__main__":
     dic = getDic(sys.argv[1])
     for _, files in dic:
-        for file in files:
-            print(file, ":")
+        if len(files) > 1:
+            print(":".join(files))
