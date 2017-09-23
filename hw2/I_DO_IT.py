@@ -7,10 +7,10 @@ from hashlib import sha1 as hasher
 def getHash(direct):
     with open(direct, 'rb') as f:
         hashe = hasher()
-        part = f.read(2048) #optimal desigion for my comp.
+        part = f.read(65536) #optimal desigion for my comp.
         while len(part):
             hashe.update(part)
-            part = f.read(2048)
+            part = f.read(65536)
     return hashe.digest()
 
 def getDic(root):
