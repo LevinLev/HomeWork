@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 
 def up_to_2pow(n):
     return 1 << (n - 1).bit_length()
@@ -7,25 +6,17 @@ def up_to_2pow(n):
 def get_len():
     return input()
 
-def print_matrix(M, lenM):
-    
+def print_matrix(M):
+    lenM, _ = M.shape
     for i in range (0, lenM):
-        for j in range (0, lenM - 1):
-            sys.stdout.write(str(M[i, j]) + " ")
-        print(str(M[i, lenM - 1]))
+        print(" ".join(str(M[i])))
 
 def get_matrix(lenM):
-    M = np.zeros((up_to_2pow(lenM), up_to_2pow(lenM)))
+    lenBM = up_to_2pow(lenM)
+    M = np.zeros((lenBM, lenBM), dtype = np.int)
     for i in range (0, lenM):
         S = input().split()
-        for j in range (0, len(S)):
-            M[i, j] = int(S[j])
-    for i in range (lenM, up_to_2pow(lenM)):
-        for j in range (0, up_to_2pow(lenM)):
-            M[i, j] = 0
-    for i in range (0, lenM):
-        for j in range (lenM, up_to_2pow(lenM)):
-            M[i, j] = 0
+        M[i] = [int(s) for s in S]
     return M
 
 def part_matrix(M):
@@ -37,17 +28,26 @@ def part_matrix(M):
 def build_matrix(M11, M12, M21, M22):
     lenm, _ = M11.shape
     lenM = lenm * 2
-    M = np.zeros((lenM, lenM))
+    M = np.zeros((lenM, lenM), dtype = np.int)
     M[:lenm, :lenm] = M11
     M[:lenm, lenm:lenM] = M12
     M[lenm:lenM, :lenm] = M21
     M[lenm:lenM, lenm:lenM] = M22
     return M
 
+def multiply_matrix(A, B):
+    lenC, _ = A.shape
+    C = np.zeros((lenC, lenC), dtype = np.int)
+    for i in range (0, lenC):
+        for j in range (0, lenC):
+            for k in range (0, lenC):
+                C[i, k] += A[i, j] * B[j, k]
+    return C
+
 def multiply_strassen(A, B):
     lenC, _ = A.shape
     if lenC <= 32:
-        return A * B
+        return multiply_matrix(A, B)
     else:
         lenc = lenC // 2
         A11, A12, A21, A22 = part_matrix(A)
@@ -70,6 +70,7 @@ if __name__ == "__main__":
     A = get_matrix(size)
     lenA = up_to_2pow(size)
     B = get_matrix(size)
-    print_matrix(multiply_strassen(A, B), size)
+    C = multiply_strassen(A, B)
+    print_matrix(C[:size, :size])
 
     
