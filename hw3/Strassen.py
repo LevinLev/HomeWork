@@ -9,14 +9,16 @@ def get_len():
 def print_matrix(M):
     lenM, _ = M.shape
     for i in range (0, lenM):
-        print(" ".join(str(M[i])))
+        print(*M[i])
 
 def get_matrix(lenM):
     lenBM = up_to_2pow(lenM)
     M = np.zeros((lenBM, lenBM), dtype = np.int)
+    N = np.zeros((lenM, lenM), dtype = np.int)
     for i in range (0, lenM):
         S = input().split()
-        M[i] = [int(s) for s in S]
+        N[i] = [int(s) for s in S]
+    M[:lenM, :lenM] = N
     return M
 
 def part_matrix(M):
