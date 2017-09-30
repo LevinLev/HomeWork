@@ -1,19 +1,14 @@
 class Scope:
     def __init__(self, parent = None):
-        self.fnames = {}
-        self.nnames = {}
+        self.names = {}
+        self.parent = parent
     def __getitem__(self, name):
-        if self.nnames.get(name, -1) != -1:
-            return self.nnames[name]
-        elif self.names.get(name, - 1) != -1:
-            return self.fnames[name]
-        elif parent != None:
-            return parent[name]
-    def __setitem__(self, name, obj):
-        if type(obj) == 'Number':
-            self.nnames[name] = obj
+        if self.names.get(name, -1) != -1:
+            return self.names[name]
         else:
-            self.fnames[name] = obj
+            return self.parent.names[name]
+    def __setitem__(self, name, obj):
+        self.names[name] = obj
 
 class Number:
     def __init__(self, value):
@@ -93,7 +88,7 @@ class Conditional:
                 return self.if_true[-1].evaluate(scope)
 
 class Print:
-    def __init__(sef, expr):
+    def __init__(self, expr):
         self.expr = expr
     def evaluate(self, scope):
         print(Number(expr.evaluate()).value)
