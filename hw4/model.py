@@ -3,10 +3,10 @@ class Scope:
         self.names = {}
         self.parent = parent
     def __getitem__(self, name):
-        if self.names.get(name, -1) != -1:
-            return self.names[name]
-        else:
+        if self.names.get(name, -1) == -1:
             return self.parent.names[name]
+        else:
+            return self.names[name]
     def __setitem__(self, name, obj):
         self.names[name] = obj
 
