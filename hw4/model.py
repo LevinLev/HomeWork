@@ -117,12 +117,7 @@ class FunctionCall:
         for op in self.args:
             self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
-        for arg in self.function.args:
-            print(arg)
-        for res in self.func_args:
-            print(res.value)
-        for res, arg in self.func_args, self.function.args:
-            print(arg.value, " = ", res.value)
+        for res, arg in list(zip(self.func_args, self.function.args)):
             self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             self.op.evaluate(self.call_scope)
@@ -149,7 +144,7 @@ class BinaryOperation:
         if type(self.rhs_expr) == 'str':
             self.rhs == scope[self.rhs_expr]
         else:
-            self.num = self.rhs_expr.evaluate(scope)
+            self.rhs = self.rhs_expr.evaluate(scope)
         if self.op == '+':
             return self.lhs + self.rhs
         elif self.op == '-':
@@ -196,14 +191,21 @@ def example():
     assert 10 == scope["bar"].value
     scope["bar"] = Number(20)
     assert scope["bar"].value == 20
-    #print('It should print 2: ', end = ' ')
+    print('It should print 2: ', end = ' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
                  [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope) 
 
-#def my_tests():
-    
+def my_tests():
+    scope = Scope()
+    print("Write x:")
+    Read('x').evaluate(scope)
+    print("Write y:")
+    Read('y').evaluate(scope)
+    print("It should print max:")
+    Conditional(BinaryOperation('y', '>', 'x'), Print(reference('y').evaluate(scope)),
+                                                    Print(refence('x').evaluate(scope)))
 
 if __name__ == '__main__':
     example()
-    #my_tests()
+    my_tests()
         
