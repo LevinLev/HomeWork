@@ -198,12 +198,14 @@ def example():
 def my_tests():
     scope = Scope()
     print("Write x:")
-    Read('x').evaluate(scope)
+    read = Read('x')
+    read.evaluate(scope)
     print("Write y:")
-    Read('y').evaluate(scope)
+    read = Read('y')
+    read.evaluate(scope)
     print("It should print max:")
     Conditional(BinaryOperation('y', '>', 'x'), Print(reference('y').evaluate(scope)),
-                                                    Print(refence('x').evaluate(scope)))
+                                        Print(refence('x').evaluate(scope))).evaluate(scope)
 
 if __name__ == '__main__':
     example()
