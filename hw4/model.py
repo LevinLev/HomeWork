@@ -24,6 +24,8 @@ class Number:
             return True
         else:
             return False
+    def __ne__(self, other):
+        return not __eq__(self. other)
     def __lt__(self, other):
         if self.value < other.value:
             return True
@@ -97,8 +99,8 @@ class Print:
     def __init__(self, expr):
         self.expr = expr
     def evaluate(self, scope):
-        print(Number(expr.evaluate()).value)
-        return Number(expr.evaluate()).value
+        print(self.expr.evaluate(scope).value)
+        return self.expr.evaluate(scope)
 
 class Read:
     def _init__(self, name):
@@ -112,13 +114,13 @@ class FunctionCall:
         self.fun_expr = fun_expr
         self.args = args
     def evaluate(self, scope):
-        self.function = scope[self.fun_expr]
-        self.func_args =[]
+        self.function = self.fun_expr.function
+        self.func_args = []
         for op in self.args:
             self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
-        for res in self.func_args:
-            self.call_scope[self.function.args] = res
+        for res, arg in self.func_args, self.function.args:
+            self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             self.op.evaluate(self.call_scope)
         return self.function.body[-1].evaluate(self.call_scope)
@@ -131,54 +133,50 @@ class Reference:
 
 class BinaryOperation:
     def __init__(self, lhs, op, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
+        self.lhs_expr = lhs
+        self.rhs_expr = rhs
         self.op = op
+        self.lhs = Number(0)
+        self.rhs = Number(0)
     def evaluate(self, scope):
-        if type(lhs) == 'str':
-            self.lhs = scope[lhs]
-        elif type(lhs) == 'Number':
-            self.lhs = lhs
+        if type(self.lhs_expr) == 'str':
+            self.lhs = scope[self.lhs_expr]
         else:
-            self.lhs = lhs.evaluate(scope)
-        if type(rhs) == 'str':
-            self.rhs == scope[rhs]
-        elif type(rhs) == 'Number':
-            els.rhs = rhs
+            self.lhs = self.lhs_expr.evaluate(scope)
+        if type(self.rhs_expr) == 'str':
+            self.rhs == scope[self.rhs_expr]
         else:
-            self.num = rhs.evaluate(scope)
-        if op == '+':
-            return lhs + rhs
-        elif op == '-':
-            return lhs - rhs
-        elif op == '*':
-            return lhs * rhs
-        elif op == '/':
-            return lhs / rhs
-        elif op == '%':
-            return lhs % rhs
-        elif op == '==':
-            return lhs == rhs
-        elif op == '!=':
-            return lhs != rhs
-        elif op == '||':
-            return lhs | rhs
+            self.num = self.rhs_expr.evaluate(scope)
+        if self.op == '+':
+            return self.lhs + self.rhs
+        elif self.op == '-':
+            return self.lhs - self.rhs
+        elif self.op == '*':
+            return self.lhs * self.rhs
+        elif self.op == '/':
+            return self.lhs / self.rhs
+        elif self.op == '%':
+            return self.lhs % self.rhs
+        elif self.op == '==':
+            return self.lhs == self.rhs
+        elif self.op == '!=':
+            return self.lhs != self.rhs
+        elif self.op == '||':
+            return self.lhs | self.rhs
         else:
-            return lhs & rhs
+            return self.lhs & self.rhs
         
 class UnaryOperation:
     def __init__(self, op, expr):
         self.expr = expr
         self.op = op
-    def evaluate(self, score):
+    def evaluate(self, scope):
         if type(self.expr) == 'str':
-            self.expr = scope[expr]
-        elif type(self.expr) == 'Number':
-            self.expr = self.expr
+            self.expr = scope[self.expr]
         else:
-            self.expr = self.expr.evaluate(score)
+            self.expr = self.expr.evaluate(scope)
         if self.op == '-':
-            return -self.expr
+            return -self.expr.evaluate(scope)
         elif self.expr.value == 0:
             return Number(1)
         else:
