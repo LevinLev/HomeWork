@@ -6,17 +6,15 @@ class Scope:
         self.parent = parent
     def __getitem__(self, name):
         if name not in self.names:
-            if name in self.parent.names:
-                return self.parent.names[name]
+            parent = self.parent
+            while parent != None:
+                if name in parent.names:
+                    return parent.names[name]
+                parent = parent.parent
         else:
             return self.names[name]
     def __setitem__(self, name, obj):
-        if self.parent == None:
-            self.names[name] = obj
-        elif name not in self.parent.names:
-            self.names[name] = obj
-        else:
-            self.parent.names[name] = obj
+        self.names[name] = obj
 
 @total_ordering
 class Number:
@@ -77,7 +75,8 @@ class FunctionDefinition:
         self.name = name
         self.function = function
     def evaluate(self, scope):
-        scope[name] = function
+        scope[self.name] = self.function
+        return self.function
 
 class Conditional:
     def __init__(self, condition, if_true, if_false = None):
@@ -85,14 +84,20 @@ class Conditional:
         self.if_true = if_true
         self.if_false = if_false
     def evaluate(self, scope):
-        if self.condition.evaluate(scope) == True:
-            for op in self.if_true[:-1]:
-                op.evaluate(scope)
-            return self.if_true[-1].evaluate(scope)
+        if self.condition.evaluate(scope) == Number(0):
+            if self.if_false == None:
+                return Number(0)
+            else:
+                for op in self.if_false[:-1]:
+                    op.evaluate(scope)
+                return self.if_false[-1].evaluate(scope)
         elif self.if_false != None:
-            for op in self.if_false[:-1]:
-                op.evaluate(scope)
-            return self.if_false[-1].evaluate(scope)
+            if self.if_true == None:
+                return Number(0)
+            else:
+                for op in self.if_true[:-1]:
+                    op.evaluate(scope)
+                return self.if_true[-1].evaluate(scope)
 
 class Print:
     def __init__(self, expr):
@@ -157,21 +162,47 @@ class BinaryOperation:
         elif self.op == '%':
             return self.lhs % self.rhs
         elif self.op == '==':
-            return self.lhs == self.rhs
+            if self.lhs == self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '!=':
-            return self.lhs != self.rhs
+            if self.lhs != self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '<=':
-            return self.lhs <= self.rhs
+            if self.lhs <= self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '<':
-            return self.lhs < self.rhs
+            if self.lhs < self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '>=':
-            return self.lhs >= self.rhs
+            if self.lhs >= self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '>':
-            return self.lhs > self.rhs
+            if self.lhs > self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         elif self.op == '||':
-            return self.lhs | self.rhs
+            if self.lhs | self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
+        elif self.op == '&&':
+            if self.lhs & self.rhs:
+                return Number(1)
+            else:
+                return Number(0)
         else:
-            return self.lhs & self.rhs
+            print("'", self.op, "': No such operation")
         
 class UnaryOperation:
     def __init__(self, op, expr):
@@ -184,10 +215,13 @@ class UnaryOperation:
             self.expr = self.expr.evaluate(scope)
         if self.op == '-':
             return -self.expr.evaluate(scope)
-        elif self.expr.value == 0:
-            return Number(1)
+        elif self.op == '!':
+            if self.expr.value == 0:
+                return Number(1)
+            else:
+                return Number(0)
         else:
-            return Number(0)
+            print("'", self.op, "': No such operation")
         
 def example():
     parent = Scope()
