@@ -1,3 +1,6 @@
+from functools import total_ordering
+@total_ordering
+
 class Scope:
     def __init__(self, parent = None):
         self.names = {}
@@ -82,16 +85,16 @@ class Conditional:
         self.if_true = if_true
         self.if_false = if_false
     def evaluate(self, scope):
-        if condition.evaluate(scope) == Number(0):
-            for op in self.if_false[:-1]:
-                op.evaluate(scope)
-            if self.if_false != None:
-                return self.if_false[-1].evaluate(scope)
-        else:
+        if self.condition.evaluate(scope) != Number(0):
             for op in self.if_true[:-1]:
                 op.evaluate(scope)
-            if self.if_true != None:
-                return self.if_true[-1].evaluate(scope)
+            print("TRUE")
+            return self.if_false[-1].evaluate(scope)
+        elif self.if_false != None:
+            for op in self.if_false[:-1]:
+                op.evaluate(scope)
+            print("FALSE")
+            return self.if_false[-1].evaluate(scope)
 
 class Print:
     def __init__(self, expr):
@@ -101,11 +104,11 @@ class Print:
         return self.expr.evaluate(scope)
 
 class Read:
-    def _init__(self, name):
+    def __init__(self, name):
         self.name = name
     def evaluate(self, scope):
-        scope[name] = Number(input())
-        return scope[name]
+        scope[self.name] = Number(input())
+        return scope[self.name]
 
 class FunctionCall: 
     def __init__(self, fun_expr, args):
@@ -159,6 +162,8 @@ class BinaryOperation:
             return self.lhs == self.rhs
         elif self.op == '!=':
             return self.lhs != self.rhs
+        elif seil.op == '<=':
+            return self.lhs
         elif self.op == '||':
             return self.lhs | self.rhs
         else:
@@ -204,8 +209,8 @@ def my_tests():
     read = Read('y')
     read.evaluate(scope)
     print("It should print max:")
-    Conditional(BinaryOperation('y', '>', 'x'), Print(reference('y').evaluate(scope)),
-                                        Print(refence('x').evaluate(scope))).evaluate(scope)
+    Conditional(BinaryOperation(Reference('y'), '>', Reference('x')), [Print(Reference('y'))],
+                                        [Print(Reference('x'))]).evaluate(scope)
 
 if __name__ == '__main__':
     example()
