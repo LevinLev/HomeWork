@@ -24,8 +24,6 @@ class Number:
             return True
         else:
             return False
-    def __ne__(self, other):
-        return not __eq__(self. other)
     def __lt__(self, other):
         if self.value < other.value:
             return True
@@ -119,7 +117,12 @@ class FunctionCall:
         for op in self.args:
             self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
+        for arg in self.function.args:
+            print(arg)
+        for res in self.func_args:
+            print(res.value)
         for res, arg in self.func_args, self.function.args:
+            print(arg.value, " = ", res.value)
             self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             self.op.evaluate(self.call_scope)
@@ -193,7 +196,7 @@ def example():
     assert 10 == scope["bar"].value
     scope["bar"] = Number(20)
     assert scope["bar"].value == 20
-    print('It should print 2: ', end = ' ')
+    #print('It should print 2: ', end = ' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
                  [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope) 
 
