@@ -1,5 +1,4 @@
 from functools import total_ordering
-@total_ordering
 
 class Scope:
     def __init__(self, parent = None):
@@ -19,11 +18,12 @@ class Scope:
         else:
             self.parent.names[name] = obj
 
+@total_ordering
 class Number:
     def __init__(self, value):
         self.value = value
     def __eq__(self, other):
-        if self.value == self.value:
+        if self.value == other.value:
             return True
         else:
             return False
@@ -85,15 +85,13 @@ class Conditional:
         self.if_true = if_true
         self.if_false = if_false
     def evaluate(self, scope):
-        if self.condition.evaluate(scope) != Number(0):
+        if self.condition.evaluate(scope) == True:
             for op in self.if_true[:-1]:
                 op.evaluate(scope)
-            print("TRUE")
-            return self.if_false[-1].evaluate(scope)
+            return self.if_true[-1].evaluate(scope)
         elif self.if_false != None:
             for op in self.if_false[:-1]:
                 op.evaluate(scope)
-            print("FALSE")
             return self.if_false[-1].evaluate(scope)
 
 class Print:
@@ -162,8 +160,14 @@ class BinaryOperation:
             return self.lhs == self.rhs
         elif self.op == '!=':
             return self.lhs != self.rhs
-        elif seil.op == '<=':
-            return self.lhs
+        elif self.op == '<=':
+            return self.lhs <= self.rhs
+        elif self.op == '<':
+            return self.lhs < self.rhs
+        elif self.op == '>=':
+            return self.lhs >= self.rhs
+        elif self.op == '>':
+            return self.lhs > self.rhs
         elif self.op == '||':
             return self.lhs | self.rhs
         else:
