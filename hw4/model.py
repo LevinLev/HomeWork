@@ -3,12 +3,18 @@ class Scope:
         self.names = {}
         self.parent = parent
     def __getitem__(self, name):
-        if self.names.get(name, -1) == -1:
-            return self.parent.names[name]
+        if name not in self.names:
+            if name in self.parent.names:
+                return self.parent.names[name]
         else:
             return self.names[name]
     def __setitem__(self, name, obj):
-        self.names[name] = obj
+        if self.parent == None:
+            self.names[name] = obj
+        elif name not in self.parent.names:
+            self.names[name] = obj
+        else:
+            self.parent.names[name] = obj
 
 class Number:
     def __init__(self, value):
@@ -101,20 +107,21 @@ class Read:
         scope[name] = Number(input())
         return scope[name]
 
-class FunctionCall:
+class FunctionCall: 
     def __init__(self, fun_expr, args):
         self.fun_expr = fun_expr
         self.args = args
     def evaluate(self, scope):
-        self.function = scope[fun_expr]
-        for op in args:
-            self.func_args.append(args.evaluate(scope))
+        self.function = scope[self.fun_expr]
+        self.func_args =[]
+        for op in self.args:
+            self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
         for res in self.func_args:
-            self.call_scope[function.args] = res
+            self.call_scope[self.function.args] = res
         for op in self.function.body[:-1]:
-            self.op.evaluate(call_scope)
-        return self.function.body[-1].evaluate(call_scope)
+            self.op.evaluate(self.call_scope)
+        return self.function.body[-1].evaluate(self.call_scope)
         
 class Reference:
     def __init__(self, name):
@@ -164,15 +171,15 @@ class UnaryOperation:
         self.expr = expr
         self.op = op
     def evaluate(self, score):
-        if tupe(expr) == 'str':
+        if type(self.expr) == 'str':
             self.expr = scope[expr]
-        elif type(expr) == 'Number':
-            self.expr = expr
+        elif type(self.expr) == 'Number':
+            self.expr = self.expr
         else:
-            self.expr = expr.evaluate(score)
-        if op == '-':
-            return -expr
-        elif expr == 0:
+            self.expr = self.expr.evaluate(score)
+        if self.op == '-':
+            return -self.expr
+        elif self.expr.value == 0:
             return Number(1)
         else:
             return Number(0)
@@ -188,7 +195,7 @@ def example():
     assert 10 == scope["bar"].value
     scope["bar"] = Number(20)
     assert scope["bar"].value == 20
-    print('It should print 2: ', end=' ')
+    print('It should print 2: ', end = ' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
                  [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope) 
 
