@@ -103,8 +103,9 @@ class Print:
     def __init__(self, expr):
         self.expr = expr
     def evaluate(self, scope):
-        print(self.expr.evaluate(scope).value)
-        return self.expr.evaluate(scope)
+        answ = self.expr.evaluate(scope)
+        print(answ.value)
+        return answ
 
 class Read:
     def __init__(self, name):
@@ -118,7 +119,7 @@ class FunctionCall:
         self.fun_expr = fun_expr
         self.args = args
     def evaluate(self, scope):
-        self.function = self.fun_expr.function
+        self.function = self.fun_expr.evaluate(scope)
         self.func_args = []
         for op in self.args:
             self.func_args.append(op.evaluate(scope))
@@ -249,6 +250,7 @@ def my_tests():
     print("It should print max:")
     Conditional(BinaryOperation(Reference('y'), '>', Reference('x')), [Print(Reference('y'))],
                                         [Print(Reference('x'))]).evaluate(scope)
+    
 
 if __name__ == '__main__':
     example()
