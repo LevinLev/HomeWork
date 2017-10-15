@@ -127,7 +127,7 @@ class FunctionCall:
         for res, arg in list(zip(self.func_args, self.function.args)):
             self.call_scope[arg] = res
         for op in self.function.body[:-1]:
-            self.op.evaluate(self.call_scope)
+            op.evaluate(self.call_scope)
         return self.function.body[-1].evaluate(self.call_scope)
         
 class Reference:
@@ -237,7 +237,7 @@ def example():
     assert scope["bar"].value == 20
     print('It should print 2: ', end = ' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
-                 [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope) 
+                 [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope)
 
 def my_tests():
     scope = Scope()
@@ -249,8 +249,7 @@ def my_tests():
     read.evaluate(scope)
     print("It should print max:")
     Conditional(BinaryOperation(Reference('y'), '>', Reference('x')), [Print(Reference('y'))],
-                                        [Print(Reference('x'))]).evaluate(scope)
-    
+                                        [Print(Reference('x'))]).evaluate(scope)   
 
 if __name__ == '__main__':
     example()
