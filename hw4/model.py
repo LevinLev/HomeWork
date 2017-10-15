@@ -168,8 +168,10 @@ class Read:
         self.name = name
 
     def evaluate(self, scope):
-        scope[self.name] = Number(input())
-        return scope[self.name]
+        var = input()
+        num = Number(var)
+        scope[self.name] = num
+        return num
 
 
 class FunctionCall:
