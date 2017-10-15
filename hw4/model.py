@@ -145,7 +145,7 @@ class Conditional:
                     op.evaluate(scope)
                 return self.if_false[-1].evaluate(scope)
         else:
-            if self.if_true is None:
+            if self.if_true is None or len(self.if_true) == 0:
                 return Number(0)
             else:
                 for op in self.if_true[:-1]:
