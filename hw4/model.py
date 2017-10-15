@@ -40,7 +40,10 @@ class Number:
             return Number(0)
 
     def __gt__(self, other):
-        return other < self
+        if self.value > other.value:
+            return Number(1)
+        else:
+            return Number(0)
 
     def __le__(self, other):
         if self.value <= other.value:
@@ -49,7 +52,10 @@ class Number:
             return Number(0)
 
     def __gt__(self, other):
-        return other <= self
+        if self.value >= other.value:
+            return Number(1)
+        else:
+            return Number(0)
 
     def __ne__(self, other):
         if self.value != other.value:
@@ -232,12 +238,9 @@ class BinaryOperation:
         elif self.op == '>':
             return self.lhs > self.rhs
         elif self.op == '&&':
-            return self.lhs & self.rhs
+            return self.lhs and self.rhs
         elif self.op == '||':
-            if self.lhs.value or self.rhs.value:
-                return Number(1)
-            else:
-                return Number(0)
+            return self.lhs or self.rhs
         else:
             print("'", self.op, "': No such operation")
 
