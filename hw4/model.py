@@ -138,7 +138,7 @@ class Conditional:
         else:
             condition = self.condition
         if condition.evaluate(scope) == Number(0):
-            if self.if_false is None:
+            if self.if_false is None or len(self.if_false) == 0:
                 return Number(0)
             else:
                 for op in self.if_false[:-1]:
