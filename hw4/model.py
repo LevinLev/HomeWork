@@ -124,6 +124,10 @@ class Conditional:
         self.if_false = if_false
 
     def evaluate(self, scope):
+        if type(self.condition) == 'str':
+            condition = scope(str)
+        else:
+            condition = self.condition
         if self.condition.evaluate(scope) == Number(0):
             if self.if_false is None:
                 return Number(0)
@@ -224,10 +228,10 @@ class BinaryOperation:
             return self.lhs >= self.rhs
         elif self.op == '>':
             return self.lhs > self.rhs
-        elif self.op == '||':
-            return self.lhs | self.rhs
         elif self.op == '&&':
-            if self.lhs.value & self.rhs.value:
+            return self.lhs & self.rhs
+        elif self.op == '||':
+            if self.lhs.value or self.rhs.value:
                 return Number(1)
             else:
                 return Number(0)
