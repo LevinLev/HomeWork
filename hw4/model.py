@@ -60,6 +60,9 @@ class Number:
     def __add__(self, other):
         return Number(self.value + other.value)
 
+    def __sub__(self, other):
+        return Number(self.value - other.value)
+
     def __mul__(self, other):
         return Number(self.value - other.value)
 
@@ -125,7 +128,7 @@ class Conditional:
 
     def evaluate(self, scope):
         if type(self.condition) == 'str':
-            condition = scope(str)
+            condition = scope(self.condition)
         else:
             condition = self.condition
         if self.condition.evaluate(scope) == Number(0):
@@ -213,7 +216,7 @@ class BinaryOperation:
         elif self.op == '*':
             return self.lhs * self.rhs
         elif self.op == '/':
-            return self.lhs / self.rhs
+            return self.lhs // self.rhs
         elif self.op == '%':
             return self.lhs % self.rhs
         elif self.op == '==':
@@ -275,7 +278,6 @@ def example():
     print('It should print 2: ', end=' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
                  [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope)
-
 
 def my_tests():
     scope = Scope()
