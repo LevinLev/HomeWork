@@ -1,3 +1,6 @@
+import sys
+
+
 class Scope:
     def __init__(self, parent=None):
         self.names = {}
@@ -20,6 +23,9 @@ class Scope:
 class Number:
     def __init__(self, value):
         self.value = value
+
+    def __hash__(self):
+        return hash(str(self.value)) % ((sys.maxsize + 1) * 2)
 
     def __eq__(self, other):
         if self.value == other.value:
@@ -125,7 +131,7 @@ class Conditional:
                 for op in self.if_false[:-1]:
                     op.evaluate(scope)
                 return self.if_false[-1].evaluate(scope)
-        elif self.if_false is not None:
+        else:
             if self.if_true is None:
                 return Number(0)
             else:
@@ -221,7 +227,7 @@ class BinaryOperation:
         elif self.op == '||':
             return self.lhs | self.rhs
         elif self.op == '&&':
-            if self.lhs & self.rhs:
+            if self.lhs.value & self.rhs.value:
                 return Number(1)
             else:
                 return Number(0)
@@ -235,14 +241,15 @@ class UnaryOperation:
         self.op = op
 
     def evaluate(self, scope):
+        num = Number(0)
         if type(self.expr) == 'str':
-            self.expr = scope[self.expr].evaluate(scope)
+            num = scope[self.expr].evaluate(scope)
         else:
-            self.expr = self.expr.evaluate(scope)
+            num = self.expr.evaluate(scope)
         if self.op == '-':
-            return -self.expr.evaluate(scope)
+            return -num
         elif self.op == '!':
-            if self.expr.value == 0:
+            if num == Number(0):
                 return Number(1)
             else:
                 return Number(0)
