@@ -70,7 +70,7 @@ class Number:
         return Number(self.value - other.value)
 
     def __mul__(self, other):
-        return Number(self.value - other.value)
+        return Number(self.value * other.value)
 
     def __floordiv__(self, other):
         return Number(self.value // other.value)
@@ -137,7 +137,7 @@ class Conditional:
             condition = scope(self.condition)
         else:
             condition = self.condition
-        if self.condition.evaluate(scope) == Number(0):
+        if condition.evaluate(scope) == Number(0):
             if self.if_false is None:
                 return Number(0)
             else:
