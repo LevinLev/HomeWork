@@ -217,7 +217,7 @@ class BinaryOperation:
         elif self.op == '%':
             return self.lhs % self.rhs
         elif self.op == '==':
-            return self.lhs == self.rhs
+            return Number(self.lhs == self.rhs)
         elif self.op == '!=':
             return self.lhs != self.rhs
         elif self.op == '<=':
