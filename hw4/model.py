@@ -28,10 +28,7 @@ class Number:
         return hash(str(self.value)) % ((sys.maxsize + 1) * 2)
 
     def __eq__(self, other):
-        if self.value == other.value:
-            return Number(1)
-        else:
-            return Number(0)
+        return self == other
 
     def __lt__(self, other):
         if self.value < other.value:
@@ -53,12 +50,6 @@ class Number:
 
     def __gt__(self, other):
         if self.value >= other.value:
-            return Number(1)
-        else:
-            return Number(0)
-
-    def __ne__(self, other):
-        if self.value != other.value:
             return Number(1)
         else:
             return Number(0)
