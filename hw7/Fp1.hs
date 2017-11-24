@@ -14,6 +14,7 @@ take' n (a:as) = a:(take' (n - 1) as)
 -- списка, то пустой список. (0,5)
 drop' :: Int -> [a] -> [a]
 drop' 0 a = a
+drop' _ [] = []
 drop' n (a:as) = drop' (n - 1) as
 -- 5. filter' возвращает список из элементов, для которых f возвращает True (0,5)
 filter' :: (a -> Bool) -> [a] -> [a]
