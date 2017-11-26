@@ -1,4 +1,5 @@
 #include "thread_pool.h"
+#include <iostream>
 
 void* ThreadPool::work(void *arg) {
 	Outfit *outfit = (Outfit*) arg;
@@ -20,13 +21,14 @@ void* ThreadPool::work(void *arg) {
 		target = *(task->foo);
 		tool = task->arg;
 		target(tool);
+		delete task;
 
 		pthread_mutex_lock(m2);
 		pool->check_in_queue();
 		pthread_mutex_unlock(m2);
 
 		pthread_mutex_lock(m3);
-		is_worktime = pool->is_end();
+		is_worktime = !pool->is_end();
 		pthread_mutex_unlock(m3);
 	}
 
@@ -45,19 +47,19 @@ ThreadPool::ThreadPool(size_t threads_nm) {
 	tasks = new std::queue<Task*>;
 	num_of_wrks = threads_nm;
 	workers = new pthread_t[num_of_wrks];
+	
+	pthread_mutex_init(&m1, NULL);
+	pthread_mutex_init(&m2, NULL);
+	pthread_mutex_init(&m3, NULL);
 
 	outfit = new Outfit;
 	outfit->pool = this;
-	outfit->m1 = m1;
-	outfit->m2 = m2;
-	outfit->m3 = m3;
+	outfit->m1 = &m1;
+	outfit->m2 = &m2;
+	outfit->m3 = &m3;
 
 	for (size_t i = 0; i < num_of_wrks; i++)
 		pthread_create(workers + i, NULL, work, outfit);
-
-	m1 = new pthread_mutex_t;
-	m2 = new pthread_mutex_t;
-	m3 = new pthread_mutex_t;
 
 	is_going_end = false;
 	num_of_fwrks = num_of_wrks;
@@ -67,9 +69,11 @@ ThreadPool::ThreadPool(size_t threads_nm) {
 ThreadPool::~ThreadPool() {
 	delete[] workers;
 	delete tasks;
-	delete m1;
-	delete m2;
-	delete m3;
+
+	pthread_mutex_destroy(&m1);
+	pthread_mutex_destroy(&m2);
+	pthread_mutex_destroy(&m3);
+
 	delete outfit;
 }
 
@@ -96,7 +100,7 @@ Task* ThreadPool::get_task() {
 		task->foo = &empty;
 		task->arg = NULL;
 	} else {
-		task = tasks->front();
+		*task = *tasks->front();
 		tasks->pop();
 	}
 

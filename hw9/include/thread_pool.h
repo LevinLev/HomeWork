@@ -8,14 +8,20 @@ struct Task {
 	void* arg;
 };
 
+struct Data1 {
+	int *array;
+	int L;
+	int R;
+};
+
 class ThreadPool {
   private:
 	std::queue<Task*> *tasks;
 	pthread_t *workers;
 
-	pthread_mutex_t *m1;
-	pthread_mutex_t *m2;
-	pthread_mutex_t *m3;
+	pthread_mutex_t m1;
+	pthread_mutex_t m2;
+	pthread_mutex_t m3;
 
 	size_t num_of_wrks;
 	size_t num_of_fwrks;
@@ -40,7 +46,7 @@ class ThreadPool {
 
 	~ThreadPool();
 
-	void submit (Task *t);
+	void submit(Task *t);
 
 	void finit();
   private:
