@@ -1,6 +1,7 @@
 #include "thread_pool.h"
 
-void* ThreadPool::work(Outfit *outfit) {
+void* ThreadPool::work(void *arg) {
+	Outfit *outfit = (Outfit*) arg;
 	pthread_mutex_t *m1 = outfit->m1;
 	pthread_mutex_t *m2 = outfit->m2;
 	pthread_mutex_t *m3 = outfit->m3;
@@ -36,7 +37,7 @@ void* ThreadPool::work(Outfit *outfit) {
 	return NULL;
 }	
 
-void ThreadPool::empty(void *v) {
+void ThreadPool::empty(void *arg) {
 	//DO NOTHING
 }
 
@@ -45,15 +46,14 @@ ThreadPool::ThreadPool(size_t threads_nm) {
 	num_of_wrks = threads_nm;
 	workers = new pthread_t[num_of_wrks];
 
-	Outfit outfit;
-	outfit.pool = this;
-	outfit.m1 = m1;
-	outfit.m2 = m2;
-	outfit.m3 = m3;
-	
-	void* arg = (void*) &outfit;
+	outfit = new Outfit;
+	outfit->pool = this;
+	outfit->m1 = m1;
+	outfit->m2 = m2;
+	outfit->m3 = m3;
+
 	for (size_t i = 0; i < num_of_wrks; i++)
-		pthread_create(workers + i, NULL, work, arg);
+		pthread_create(workers + i, NULL, work, outfit);
 
 	m1 = new pthread_mutex_t;
 	m2 = new pthread_mutex_t;
@@ -66,7 +66,11 @@ ThreadPool::ThreadPool(size_t threads_nm) {
 
 ThreadPool::~ThreadPool() {
 	delete[] workers;
-	delete[] tasks;
+	delete tasks;
+	delete m1;
+	delete m2;
+	delete m3;
+	delete outfit;
 }
 
 void ThreadPool::submit(Task *t) {
@@ -102,7 +106,7 @@ Task* ThreadPool::get_task() {
 }
 
 bool ThreadPool::is_end() {
-	return is_going_end && num_of_fwrks == tasks->size();
+	return is_going_end && num_of_fwrks >= tasks->size();
 }
 
 void ThreadPool::check_in_queue() {

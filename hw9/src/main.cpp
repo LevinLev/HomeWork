@@ -1,6 +1,6 @@
 #include "thread_pool.h"
 
-int main()
+int main() {
 	ThreadPool pool(4);
 	pool.finit();
 	return 0;

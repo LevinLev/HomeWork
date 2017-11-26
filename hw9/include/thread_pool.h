@@ -30,9 +30,11 @@ class ThreadPool {
 		pthread_mutex_t *m3;
 	};
   private:
-	static void *work(Outfit *outfit);
+	Outfit *outfit;
+  private:
+	static void *work(void *arg);
 	
-	static void empty(void *v);
+	static void empty(void *arg);
   public:
 	ThreadPool(size_t threads_nm);
 
