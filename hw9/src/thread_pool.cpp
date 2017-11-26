@@ -1,6 +1,12 @@
 #include "thread_pool.h"
 #include <iostream>
 
+void wait(Task *t) {
+	while (t->is_done == false) {
+		//wait
+	}
+}
+
 void* ThreadPool::work(void *arg) {
 	Outfit *outfit = (Outfit*) arg;
 	pthread_mutex_t *m1 = outfit->m1;
@@ -21,7 +27,9 @@ void* ThreadPool::work(void *arg) {
 		target = *(task->foo);
 		tool = task->arg;
 		target(tool);
-		delete task;
+		task->is_done = true;
+		if (target == empty)
+			delete task;
 
 		pthread_mutex_lock(m2);
 		pool->check_in_queue();
@@ -94,13 +102,15 @@ void ThreadPool::finit() {
 }
 
 Task* ThreadPool::get_task() {
-	Task *task = new Task;
+	Task *task;
 
 	if (tasks->size() == 0) {
+		task = new Task;
 		task->foo = &empty;
 		task->arg = NULL;
+		task->is_done = false;
 	} else {
-		*task = *tasks->front();
+		task = tasks->front();
 		tasks->pop();
 	}
 

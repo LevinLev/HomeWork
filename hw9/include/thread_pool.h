@@ -6,6 +6,7 @@
 struct Task {
 	void (*foo)(void*);
 	void* arg;
+	bool is_done;
 };
 
 struct Data1 {
@@ -13,6 +14,8 @@ struct Data1 {
 	int L;
 	int R;
 };
+
+void wait(Task *t);
 
 class ThreadPool {
   private:

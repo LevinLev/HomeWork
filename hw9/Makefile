@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -O2 -Wall -Werror -std=c++11 -Iinclude
 LDFLAGS = -pthread
 
-EXE = main
+EXE = pqsort
 SRCDIR = src
 BINDIR = bin
 

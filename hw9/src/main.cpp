@@ -22,6 +22,7 @@ int main() {
 		data[i].R = i * 3 + 3;
 		task[i].foo = inc;
 		task[i].arg = &data[i];
+		task[i].is_done = false;
 		pool1.submit(task + i);
 	}
 	pool1.finit();
