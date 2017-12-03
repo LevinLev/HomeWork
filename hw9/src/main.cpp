@@ -1,6 +1,12 @@
 #include "thread_pool.h"
 #include <iostream>
 
+struct Data1 {
+	int *array;
+	int L;
+	int R;
+};
+
 void inc(void *arg) {
 	Data1 *data = (Data1*) arg;
 	for (int i = data->L; i < data->R; i++)
@@ -20,9 +26,8 @@ int main() {
 		data[i].array = array;
 		data[i].L = i * 3;
 		data[i].R = i * 3 + 3;
-		task[i].foo = inc;
-		task[i].arg = &data[i];
-		task[i].is_done = false;
+		task[i].set_func(inc);
+		task[i].set_arg(&data[i]);
 		pool1.submit(task + i);
 	}
 	pool1.finit();

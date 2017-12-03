@@ -1,18 +1,30 @@
-#ifndef _THREAD_POOL_H_
-#define _THREAD_POOL_H_
+#ifndef THREAD_POOL_H
+#define THREAD_POOL_H
 #include <pthread.h>
 #include <queue>
 
-struct Task {
-	void (*foo)(void*);
-	void* arg;
+class Task {
+  private:
+	void (*f)(void*);
+	void *a;
+	
+	pthread_mutex_t m;
+	pthread_cond_t c;
+	
 	bool is_done;
-};
+  public:
+  	Task(void *arg, void (*foo)(void*));
+  	~Task();
+  	
+  	void wait();
 
-struct Data1 {
-	int *array;
-	int L;
-	int R;
+  	void *(get_func())(void*);
+  	void *get_arg();
+
+  	void set_func(void (*foo)(void*));
+  	void set_arg(void *arg);
+  	
+  	void set_done();
 };
 
 void wait(Task *t);
@@ -20,30 +32,15 @@ void wait(Task *t);
 class ThreadPool {
   private:
 	std::queue<Task*> *tasks;
+	size_t num_of_wrks;
 	pthread_t *workers;
 
-	pthread_mutex_t m1;
-	pthread_mutex_t m2;
-	pthread_mutex_t m3;
+	pthread_mutex_t m;
 
-	size_t num_of_wrks;
-	size_t num_of_fwrks;
-	volatile size_t num_of_ewrks;
-
-	bool is_going_end;
-  private:
-	struct Outfit {
-		ThreadPool *pool;
-		pthread_mutex_t *m1;
-		pthread_mutex_t *m2;
-		pthread_mutex_t *m3;
-	};
-  private:
-	Outfit *outfit;
+	pthread_cond_t c;
+	bool is_queue_empty;
   private:
 	static void *work(void *arg);
-	
-	static void empty(void *arg);
   public:
 	ThreadPool(size_t threads_nm);
 
@@ -54,10 +51,11 @@ class ThreadPool {
 	void finit();
   private:
 	Task* get_task();
-
-	bool is_end();
-	void check_in_queue();
-	void release_worker();
+	
+	bool is_empty();
+	
+	pthread_mutex_t *get_mutex();
+	pthread_cond_t *get_cond();
 };
 
 #endif
