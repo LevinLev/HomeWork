@@ -14,7 +14,7 @@ void inc(void *arg) {
 }
 
 int main() {
-	ThreadPool pool(2);
+	ThreadPool pool(0);
 	pool.finit();
 
 	ThreadPool pool1(4);
@@ -26,10 +26,11 @@ int main() {
 		data[i].array = array;
 		data[i].L = i * 3;
 		data[i].R = i * 3 + 3;
-		task[i].set_func(inc);
-		task[i].set_arg(&data[i]);
+		task[i].func = inc;
+		task[i].arg = &data[i];
 		pool1.submit(task + i);
 	}
+	
 	pool1.finit();
 
 	for (int i = 0 ; i < 12; i++)

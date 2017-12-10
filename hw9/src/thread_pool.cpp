@@ -1,9 +1,7 @@
 #include "thread_pool.h"
 #include <iostream>
 
-Task::Task(void *arg, void (*foo)(void*)): 
-										   f(foo),
-										   a(arg) {
+Task::Task() {
 	pthread_mutex_init(&m, NULL);
 	pthread_cond_init(&c, NULL);
 	is_done = false;
@@ -21,22 +19,6 @@ void Task::wait() {
 	pthread_mutex_unlock(&m);
 }
 
-void *(Task::get_func())(void*) {
-	return f;
-}
-
-void *Task::get_arg() {
-	return a;
-}
-
-void Task::set_func(void (*foo)(void*)) {
-	f = foo;
-}
-
-void Task::set_arg(void *arg) {
-	a = arg;
-}
-
 void Task::set_done() {
 	pthread_mutex_lock(&m);
 	is_done = true;
@@ -46,26 +28,21 @@ void Task::set_done() {
 
 void* ThreadPool::work(void *arg) {
 	ThreadPool *pool = (ThreadPool*) arg;
-	pthread_mutex_t *m = pool->get_mutex();
-	pthread_cond_t *c = pool->get_cond();
 
 	Task *task;
 	void (*target)(void*);
 	void *tool;
 
 	while (true) {
-		pthread_mutex_lock(m);
-		while (pool->is_empty())
-			pthread_cond_wait(c, m);
-	
 		task = pool->get_task();
-		pthread_mutex_unlock(m);
+		if (task == NULL)
+			break;
 
-		target = task->get_func();
-		tool = task->get_arg();
+		target = task->func;
+		tool = task->arg;
 		target(tool);
 
-		task->set_done();
+		pool->set_done(task);
 	}
 
 	return NULL;
@@ -78,8 +55,9 @@ ThreadPool::ThreadPool(size_t threads_nm) {
 	
 	pthread_mutex_init(&m, NULL);
 	pthread_cond_init(&c, NULL);
-	is_queue_empty = true;
-	pthread_cond_init(&c, NULL);
+	pthread_cond_init(&c_done, NULL);
+	tasks_in_work = 0;
+	is_end = false;
 
 	for (size_t i = 0; i < num_of_wrks; i++)
 		pthread_create(workers + i, NULL, work, this);
@@ -91,42 +69,55 @@ ThreadPool::~ThreadPool() {
 
 	pthread_mutex_destroy(&m);
 	pthread_cond_destroy(&c);
+	pthread_cond_destroy(&c_done);
 }
 
 void ThreadPool::submit(Task *t) {
 	pthread_mutex_lock(&m);
-	is_queue_empty = false;
+	tasks->push(t);
 	pthread_cond_signal(&c);
 	pthread_mutex_unlock(&m);
 }
 
 void ThreadPool::finit() {
 	pthread_mutex_lock(&m);
-	while(!is_queue_empty)
-		pthread_cond_wait(&c, &m);
+	while(tasks_in_work != 0 || tasks->size() != 0)
+		pthread_cond_wait(&c_done, &m);
+	is_end = true;
 	pthread_mutex_unlock(&m);
-	
-	for (size_t i = 0; i < num_of_wrks; i++)
+
+	for (size_t i = 0; i < num_of_wrks; i++) {
+		pthread_cond_signal(&c);
 		pthread_join(workers[i], NULL);
+	}
 }
 
 Task* ThreadPool::get_task() {
+	pthread_mutex_lock(&m);
 	Task *task;
+
+	while (tasks->size() == 0 && !is_end)
+		pthread_cond_wait(&c, &m);
+
+	if (is_end == true) {
+		pthread_mutex_unlock(&m);
+		return NULL;
+	}
 
 	task = tasks->front();
 	tasks->pop();
+	tasks_in_work++;
+
+	pthread_mutex_unlock(&m);
 
 	return task;
 }
 
-bool ThreadPool::is_empty() {
-	return is_queue_empty;
-}
+void ThreadPool::set_done(Task *t) {
+	pthread_mutex_lock(&m);
+	tasks_in_work--;
+	pthread_cond_signal(&c_done);
+	pthread_mutex_unlock(&m);
 
-pthread_mutex_t *ThreadPool::get_mutex() {
-	return &m;
-}
-
-pthread_cond_t *ThreadPool::get_cond() {
-	return &c;
+	t->set_done();
 }

@@ -4,30 +4,22 @@
 #include <queue>
 
 class Task {
-  private:
-	void (*f)(void*);
-	void *a;
-	
+  public:
+	void (*func)(void*);
+	void *arg;
+  private:	
 	pthread_mutex_t m;
 	pthread_cond_t c;
 	
 	bool is_done;
   public:
-  	Task(void *arg, void (*foo)(void*));
+  	Task();
   	~Task();
   	
   	void wait();
-
-  	void *(get_func())(void*);
-  	void *get_arg();
-
-  	void set_func(void (*foo)(void*));
-  	void set_arg(void *arg);
   	
   	void set_done();
 };
-
-void wait(Task *t);
 
 class ThreadPool {
   private:
@@ -38,7 +30,10 @@ class ThreadPool {
 	pthread_mutex_t m;
 
 	pthread_cond_t c;
-	bool is_queue_empty;
+	bool is_end;
+
+	pthread_cond_t c_done;
+	size_t tasks_in_work;
   private:
 	static void *work(void *arg);
   public:
@@ -47,15 +42,12 @@ class ThreadPool {
 	~ThreadPool();
 
 	void submit(Task *t);
+	
+	void set_done(Task* t);
 
 	void finit();
   private:
 	Task* get_task();
-	
-	bool is_empty();
-	
-	pthread_mutex_t *get_mutex();
-	pthread_cond_t *get_cond();
 };
 
 #endif

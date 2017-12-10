@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O2 -Wall -Werror -std=c++11 -Iinclude
+CXXFLAGS = -Wall -Werror -std=c++11 -Iinclude -g
 LDFLAGS = -pthread
 
 EXE = pqsort
