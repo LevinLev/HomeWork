@@ -12,7 +12,7 @@ lookup _ Nil    = Nothing
 lookup k (Node k' v' l' r')
     | k > k'    = lookup k r'
     | k < k'    = lookup k l'
-	| otherwise = Just v'
+    | otherwise = Just v'
 
 -- Takes a key, value and tree and returns a new tree with key/value pair inserted.
 -- If the given key was already present, the value is updated in the new tree.
@@ -27,9 +27,9 @@ insert k v (Node k' v' l' r')
 delete :: Ord k => k -> BinaryTree k v -> BinaryTree k v
 delete k Nil    = Nil
 delete k (Node k' v' Nil r')
-	| k == k'   = r'
+    | k == k'   = r'
     | otherwise = (Node k' v' Nil (delete k r'))
 delete k (Node k' v' (Node k'' v'' l'' r'') r')
     | k > k'    = (Node k' v' (Node k'' v'' l'' r'') (delete k r'))
-    | k < k'    = (Node k' v' (delete k (Node l'' v'' l'' r'')) r')
-    | otherwise = (Node k'' v'' (delete k (Node k  v  l'' r'')) r')
+    | k < k'    = (Node k' v' (delete k (Node k'' v'' l'' r'')) r')
+    | otherwise = (Node k'' v'' (delete k (Node k  v'  l'' r'')) r')
