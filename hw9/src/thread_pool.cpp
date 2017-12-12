@@ -22,26 +22,19 @@ void Task::wait() {
 void Task::set_done() {
 	pthread_mutex_lock(&m);
 	is_done = true;
-	pthread_cond_signal(&c);
+	pthread_cond_broadcast(&c);
 	pthread_mutex_unlock(&m);
 }
 
 void* ThreadPool::work(void *arg) {
 	ThreadPool *pool = (ThreadPool*) arg;
-
 	Task *task;
-	void (*target)(void*);
-	void *tool;
 
 	while (true) {
 		task = pool->get_task();
 		if (task == NULL)
 			break;
-
-		target = task->func;
-		tool = task->arg;
-		target(tool);
-
+		task->func(task->arg);
 		pool->set_done(task);
 	}
 
@@ -75,21 +68,20 @@ ThreadPool::~ThreadPool() {
 void ThreadPool::submit(Task *t) {
 	pthread_mutex_lock(&m);
 	tasks->push(t);
-	pthread_cond_signal(&c);
+	pthread_cond_broadcast(&c);
 	pthread_mutex_unlock(&m);
 }
 
 void ThreadPool::finit() {
 	pthread_mutex_lock(&m);
-	while(tasks_in_work != 0 || tasks->size() != 0)
+	while (tasks_in_work != 0 || tasks->size() != 0)
 		pthread_cond_wait(&c_done, &m);
 	is_end = true;
+	pthread_cond_broadcast(&c);
 	pthread_mutex_unlock(&m);
 
-	for (size_t i = 0; i < num_of_wrks; i++) {
-		pthread_cond_signal(&c);
+	for (size_t i = 0; i < num_of_wrks; i++)
 		pthread_join(workers[i], NULL);
-	}
 }
 
 Task* ThreadPool::get_task() {
@@ -116,7 +108,7 @@ Task* ThreadPool::get_task() {
 void ThreadPool::set_done(Task *t) {
 	pthread_mutex_lock(&m);
 	tasks_in_work--;
-	pthread_cond_signal(&c_done);
+	pthread_cond_broadcast(&c_done);
 	pthread_mutex_unlock(&m);
 
 	t->set_done();
