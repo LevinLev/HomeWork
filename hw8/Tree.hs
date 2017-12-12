@@ -26,10 +26,12 @@ insert k v (Node k' v' l' r')
 -- Returns a new tree without the given key
 delete :: Ord k => k -> BinaryTree k v -> BinaryTree k v
 delete k Nil    = Nil
-delete k (Node k' v' Nil r')
-    | k == k'   = r'
-    | otherwise = (Node k' v' Nil (delete k r'))
-delete k (Node k' v' (Node k'' v'' l'' r'') r')
-    | k > k'    = (Node k' v' (Node k'' v'' l'' r'') (delete k r'))
-    | k < k'    = (Node k' v' (delete k (Node k'' v'' l'' r'')) r')
-    | otherwise = (Node k'' v'' (delete k (Node k  v'  l'' r'')) r')
+delete k (Node k' v' l' r')
+    | k > k'    = (Node k' v' l' (delete k r'))
+    | k < k'    = (Node k' v' (delete k l') r')
+    | otherwise = (phd (Node k' v' l' r'))
+         --phd means "put head down".
+         where phd :: BinaryTree k v -> BinaryTree k v
+               phd Nil                             = Nil
+               phd (Node k v Nil r)                = r
+               phd (Node k v (Node k' v' l' r') r) = (Node k' v' (phd (Node k v l' r')) r)
