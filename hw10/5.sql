@@ -1,5 +1,5 @@
-select GovernmentForm, sum(SurfaceArea) as "TotalSurfaseArea"
-from Country
-group by GovernmentForm
-order by "totalSurfaseArea" desc
+SELECT GovernmentForm, SUM(SurfaceArea) AS Surface
+FROM Country
+GROUP BY GovernmentForm
+ORDER BY Surface desc
 limit 1;

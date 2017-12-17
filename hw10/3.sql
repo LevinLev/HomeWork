@@ -1,5 +1,5 @@
-select City.Name
-from Capital
-join City on Capital.CityId=City.Id
-join Country on Capital.CountryCode=Country.Code
-where Country.Name="Malaysia";
+SELECT City.Name
+FROM Capital
+JOIN City ON Capital.CityId = City.Id
+JOIN Country ON Capital.CountryCode = Country.Code
+WHERE Country.Name = "Malaysia";

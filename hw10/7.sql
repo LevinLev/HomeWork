@@ -1,6 +1,6 @@
-select Country.Name
-from Country
-left join City on Country.Code=City.CountryCode
-group by Country.Name
-having sum(City.Population) < (Country.Population - sum(City.Population)) or (sum(City.Population) is null) and Country.Population > 0
-order by Country.Name;
+SELECT Country.Name
+FROM Country
+LEFT JOIN City ON Country.Code = City.CountryCode
+GROUP BY Country.Name
+HAVING SUM(City.Population) < (Country.Population - SUM(City.Population)) OR (SUM(City.Population) IS NULL) AND Country.Population > 0
+ORDER BY Country.Name;
