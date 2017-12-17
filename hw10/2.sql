@@ -1,4 +1,4 @@
-select LiteracyRate.Name, LiteracyRate.Rate
+select result.Name, result.Rate
 from (
 select Country.Name, LiteracyRate.Rate, max(LiteracyRate.Year)
 from LiteracyRate
