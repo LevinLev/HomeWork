@@ -1,3 +1,3 @@
 SELECT Name FROM Country
-ORDER BY SurfaceArea desc, Name
+ORDER BY SurfaceArea DESC, Name
 limit 5;
