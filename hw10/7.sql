@@ -1,4 +1,4 @@
-select Country.Name, Country.Population
+select Country.Name
 from Country
 left join City on Country.Code=City.CountryCode
 group by Country.Name
