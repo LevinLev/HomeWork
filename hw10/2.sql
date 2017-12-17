@@ -1,7 +1,9 @@
-select Country.Name, LiteracyRate.Rate
+select LiteracyRate.Name, LiteracyRate.Rate
+from (
+select Country.Name, LiteracyRate.Rate, max(LiteracyRate.Year)
 from LiteracyRate
 join Country on LiteracyRate.CountryCode=Country.Code
 group by Country.Name
-having max(LiteracyRate.Year) = LiteracyRate.Year
+) as result
 order by LiteracyRate.Rate desc
 limit 1;
