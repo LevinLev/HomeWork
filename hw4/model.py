@@ -24,11 +24,17 @@ class Number:
     def __init__(self, value):
         self.value = value
 
+    def get_value(self):
+        return self.value
+
     def __hash__(self):
         return hash(str(self.value)) % ((sys.maxsize + 1) * 2)
 
     def __eq__(self, other):
-        return self.value == other.value
+        if self.value == other.value:
+           return Number(1)
+        else:
+            return Number(0)
 
     def __lt__(self, other):
         if self.value < other.value:
@@ -128,7 +134,7 @@ class Conditional:
             condition = scope(self.condition)
         else:
             condition = self.condition
-        if condition.evaluate(scope) == Number(0):
+        if condition.evaluate(scope).get_value() == 0:
             if self.if_false is None or len(self.if_false) == 0:
                 return Number(0)
             else:
