@@ -1,5 +1,5 @@
 import sys
-import static_analyzer
+
 
 class Scope:
     def __init__(self, parent=None):
@@ -103,7 +103,7 @@ class Number:
     def evaluate(self, scope):
         return self
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_number(self)
 
 
@@ -115,7 +115,7 @@ class Function:
     def evaluate(self, scope):
         return self
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_function(self)
 
 
@@ -128,7 +128,7 @@ class FunctionDefinition:
         scope[self.name] = self.function
         return self.function
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_func_def(self)
 
 
@@ -158,7 +158,7 @@ class Conditional:
                     op.evaluate(scope)
                 return self.if_true[-1].evaluate(scope)
 
-    def visit(self, v):
+    def accept(self, v):
         return visit_cond(self)
 
 
@@ -171,7 +171,7 @@ class Print:
         print(answ.value)
         return answ
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_write(self)
 
 
@@ -183,7 +183,7 @@ class Read:
         scope[self.name] = Number(int(input()))
         return scope[self.name]
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_read(self)
 
 
@@ -204,7 +204,7 @@ class FunctionCall:
             op.evaluate(self.call_scope)
         return self.function.body[-1].evaluate(self.call_scope)
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_func_call(self)
 
 
@@ -215,7 +215,7 @@ class Reference:
     def evaluate(self, scope):
         return scope[self.name]
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_ref(self)
 
 
@@ -265,7 +265,7 @@ class BinaryOperation:
         else:
             print("'", self.op, "': No such operation")
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_bin_op(self)
 
 
@@ -290,38 +290,5 @@ class UnaryOperation:
         else:
             print("'", self.op, "': No such operation")
 
-    def visit(self, v):
+    def accept(self, v):
         return v.visit_un_op(self)
-
-
-def example():
-    parent = Scope()
-    parent["foo"] = Function(('hello', 'world'),
-                             [Print(BinaryOperation(Reference('hello'),
-                                                    '+',
-                                                    Reference('world')))])
-    parent["bar"] = Number(10)
-    scope = Scope(parent)
-    assert 10 == scope["bar"].value
-    scope["bar"] = Number(20)
-    assert scope["bar"].value == 20
-    print('It should print 2: ', end=' ')
-    FunctionCall(FunctionDefinition('foo', parent['foo']),
-                 [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope)
-
-def my_tests():
-    scope = Scope()
-    print("Write x:")
-    read = Read('x')
-    read.evaluate(scope)
-    print("Write y:")
-    read = Read('y')
-    read.evaluate(scope)
-    print("It should print max:")
-    Conditional(BinaryOperation(Reference('y'), '>', Reference('x')),
-                [Print(Reference('y'))],
-                [Print(Reference('x'))]).evaluate(scope)
-
-if __name__ == '__main__':
-    example()
-    my_tests()

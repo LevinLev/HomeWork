@@ -3,7 +3,7 @@ import sys
 
 class PureCheckVisitor:
     def visit(self, prog):
-        return prog.visit()
+        return prog.accept(self)
 
     def visit_number(self, number):
         return True
