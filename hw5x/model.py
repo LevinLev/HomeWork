@@ -1,4 +1,5 @@
 import sys
+#from static_analyzer import*
 
 
 class Scope:
@@ -159,7 +160,7 @@ class Conditional:
                 return self.if_true[-1].evaluate(scope)
 
     def accept(self, v):
-        return visit_cond(self)
+        return v.visit_cond(self)
 
 
 class Print:
