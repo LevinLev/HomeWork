@@ -28,7 +28,7 @@ class Number:
         return hash(str(self.value)) % ((sys.maxsize + 1) * 2)
 
     def __eq__(self, other):
-        return self == other
+        return self.value == other.value
 
     def __lt__(self, other):
         if self.value < other.value:
