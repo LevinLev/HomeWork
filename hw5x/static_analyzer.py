@@ -5,6 +5,12 @@ class PureCheckVisitor:
     def visit(self, prog):
         return prog.accept(self)
 
+    def visit_list(self, l):
+        for op in l:
+            if not op.accept(self):
+                return False
+        return True
+
     def visit_number(self, number):
         return True
 
@@ -18,16 +24,14 @@ class PureCheckVisitor:
         return True
 
     def visit_function(self, function):
-        for op in function.body:
-            if op.accept(self) is False:
-                return False
-        return True
+        return self.visit_list(function.body)
 
     def visit_func_def(self, func_def):
         return func_def.function.accept(self)
 
     def visit_func_call(self, func_call):
-        return func_call.fun_expr.accept(self)
+        answ = self.visit_list(func_call.args)
+        return answ and func_call.fun_expr.accept(self)
 
     def visit_bin_op(self, bin_op):
         return bin_op.lhs_expr.accept(self) and bin_op.rhs_expr.accept(self)
@@ -37,9 +41,7 @@ class PureCheckVisitor:
 
     def visit_cond(self, cond):
         answ = cond.condition.accept(self)
-        for op in cond.if_true:
-            answ = answ and op.accept(self)
-        if cond.if_true is not None:
-            for op in cond.if_false:
-                answ = answ and op.accept(self)
+        answ = answ and self.visit_list(cond.if_true)
+        if cond.if_false is not None:
+            answ = answ and self.visit_list(cond.if_false)
         return answ
