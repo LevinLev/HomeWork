@@ -125,16 +125,17 @@ class FunctionCall:
     def evaluate(self, scope):
         self.function = self.fun_expr.evaluate(scope)
         self.func_args = []
-        if self.args is not None and len(self.args) != 0:
+        if self.args is not None:
             for op in self.args:
                 self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
-        if self.args is not None and len(self.args) != 0:
+        if self.args is not None:
             for res, arg in list(zip(self.func_args, self.function.args)):
                 self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             op.evaluate(self.call_scope)
-        return self.function.body[-1].evaluate(self.call_scope)
+        if self.function.body is not None and len(self.function.body) != 0 
+            return self.function.body[-1].evaluate(self.call_scope)
 
 
 class Reference:
