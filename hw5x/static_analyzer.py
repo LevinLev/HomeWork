@@ -41,3 +41,54 @@ class PureCheckVisitor:
         answ = answ and self.visit_list(cond.if_true)
         answ = answ and self.visit_list(cond.if_false)
         return answ
+
+
+class NoReturnValueCheckVisitor:
+    def visit(self, prog):
+        return prog.accept(self)
+
+    def visit_list(self, l):
+        if l is None:
+            return True
+        elif len(l) == 0:
+            return True
+        else:
+            return l[-1].accept(self)
+
+    def visit_number(self, number):
+        return False
+
+    def visit_read(self, read):
+        return False
+
+    def visit_print(self, printer):
+        return False
+
+    def visit_ref(self, ref):
+        return False
+
+    def visit_bin_op(self, bin_op):
+        return False
+
+    def visit_un_op(self, un_op):
+        return False
+
+    def visit_cond(self, cond):
+        answ = cond.condition.accept(self)
+        answ = answ or self.visit_list(cond.if_true)
+        answ = answ or self.visit_list(cond.if_false)
+        return answ
+
+    def visit_function(self, function):
+        return self.visit_list(function.body)
+
+    def visit_func_def(self, func_def):
+        if func_def.function.accept(self):
+            print(func_def.name)
+        return False
+
+    def visit_func_call(self, func_call):
+        for op in func_call.args or []:
+            if op.accept(self):
+                return True
+        return False
