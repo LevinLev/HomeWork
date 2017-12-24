@@ -24,41 +24,11 @@ class Number:
     def __init__(self, value):
         self.value = value
 
-    def get_value(self):
-        return self.value
-
     def __hash__(self):
         return hash(str(self.value)) % ((sys.maxsize + 1) * 2)
 
     def __eq__(self, other):
-        if self.value == other.value:
-           return Number(1)
-        else:
-            return Number(0)
-
-    def __lt__(self, other):
-        if self.value < other.value:
-            return Number(1)
-        else:
-            return Number(0)
-
-    def __gt__(self, other):
-        if self.value > other.value:
-            return Number(1)
-        else:
-            return Number(0)
-
-    def __le__(self, other):
-        if self.value <= other.value:
-            return Number(1)
-        else:
-            return Number(0)
-
-    def __gt__(self, other):
-        if self.value >= other.value:
-            return Number(1)
-        else:
-            return Number(0)
+        return self.value == other.value
 
     def __add__(self, other):
         return Number(self.value + other.value)
@@ -75,30 +45,8 @@ class Number:
     def __mod__(self, other):
         return Number(self.value % other.value)
 
-    def __and__(self, other):
-        if self.value == 0:
-            lhs = 0
-        else:
-            lhs = 1
-        if other.value == 0:
-            rhs = 0
-        else:
-            rhs = 1
-        return Number(lhs & rhs)
-
-    def __or__(self, other):
-        if self.value == 0:
-            lhs = 0
-        else:
-            lhs = 1
-        if other.value == 0:
-            rhs = 0
-        else:
-            rhs = 1
-        return Number(lhs | rhs)
-
     def __neg__(self):
-        return Number(-self.value)
+        return Number(0) - self
 
     def evaluate(self, scope):
         return self
@@ -134,7 +82,7 @@ class Conditional:
             condition = scope(self.condition)
         else:
             condition = self.condition
-        if condition.evaluate(scope).get_value() == 0:
+        if condition.evaluate(scope) == Number(0):
             if self.if_false is None or len(self.if_false) == 0:
                 return Number(0)
             else:
@@ -177,11 +125,13 @@ class FunctionCall:
     def evaluate(self, scope):
         self.function = self.fun_expr.evaluate(scope)
         self.func_args = []
-        for op in self.args:
-            self.func_args.append(op.evaluate(scope))
+        if self.args is not None:
+            for op in self.args:
+                self.func_args.append(op.evaluate(scope))
         self.call_scope = Scope(scope)
-        for res, arg in list(zip(self.func_args, self.function.args)):
-            self.call_scope[arg] = res
+        if self.args is not None:
+            for res, arg in list(zip(self.func_args, self.function.args)):
+                self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             op.evaluate(self.call_scope)
         return self.function.body[-1].evaluate(self.call_scope)
@@ -223,21 +173,21 @@ class BinaryOperation:
         elif self.op == '%':
             return self.lhs % self.rhs
         elif self.op == '==':
-            return Number(int(self.lhs == self.rhs))
+            return Number(int(self.lhs.value == self.rhs.value))
         elif self.op == '!=':
-            return self.lhs != self.rhs
+           return Number(int(self.lhs.value != self.rhs.value))
         elif self.op == '<=':
-            return self.lhs <= self.rhs
+            return Number(int(self.lhs.value <= self.rhs.value))
         elif self.op == '<':
-            return self.lhs < self.rhs
+            return Number(int(self.lhs.value < self.rhs.value))
         elif self.op == '>=':
-            return self.lhs >= self.rhs
+            return Number(int(self.lhs.value >= self.rhs.value))
         elif self.op == '>':
-            return self.lhs > self.rhs
+            return Number(int(self.lhs.value > self.rhs.value))
         elif self.op == '&&':
-            return self.lhs and self.rhs
+            return Number(int(self.lhs.value and self.rhs.value))
         elif self.op == '||':
-            return self.lhs or self.rhs
+            return Number(int(self.lhs.value or self.rhs.value))
         else:
             print("'", self.op, "': No such operation")
 
