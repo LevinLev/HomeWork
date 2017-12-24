@@ -134,7 +134,7 @@ class FunctionCall:
                 self.call_scope[arg] = res
         for op in self.function.body[:-1]:
             op.evaluate(self.call_scope)
-        if self.function.body is not None and len(self.function.body) != 0 
+        if self.function.body is not None and len(self.function.body) != 0:
             return self.function.body[-1].evaluate(self.call_scope)
 
 
