@@ -64,7 +64,7 @@ class NoReturnValueCheckVisitor:
         return False
 
     def visit_print(self, printer):
-        return False
+        return printer.expr.accept(self)
 
     def visit_ref(self, ref):
         return False
