@@ -47,7 +47,7 @@ class NoReturnValueCheckVisitor:
     def visit(self, prog):
         return prog.accept(self)
 
-    def visit_list(self, l):
+    def visit_body(self, l):
         if not l:
             return True
         else:
@@ -92,6 +92,8 @@ class NoReturnValueCheckVisitor:
         return False
 
     def visit_func_call(self, func_call):
-        answ = self.visit_list(func_call.args)
+        answ = False
+        for op in func_call.args or []:
+            answ = op.accept(self) or answ
         answ = func_call.fun_expr.accept(self) or answ
         return answ
