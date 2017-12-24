@@ -1,14 +1,9 @@
-import sys
-
-
 class PureCheckVisitor:
     def visit(self, prog):
         return prog.accept(self)
 
     def visit_list(self, l):
-        if l is None:
-            return True
-        for op in l:
+        for op in l or []:
             if not op.accept(self):
                 return False
         return True
@@ -19,7 +14,7 @@ class PureCheckVisitor:
     def visit_read(self, read):
         return False
 
-    def visit_write(self, write):
+    def visit_print(self, printer):
         return False
 
     def visit_ref(self, ref):

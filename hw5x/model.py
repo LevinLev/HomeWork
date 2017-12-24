@@ -173,7 +173,7 @@ class Print:
         return answ
 
     def accept(self, v):
-        return v.visit_write(self)
+        return v.visit_print(self)
 
 
 class Read:
