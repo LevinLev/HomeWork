@@ -162,14 +162,14 @@ class BinaryOperation:
         self.opers['*'] = lambda x, y: x * y
         self.opers['/'] = lambda x, y: x // y
         self.opers['%'] = lambda x, y: x % y
-        self.opers['=='] = lambda x, y: Number(x == y)
-        self.opers['!='] = lambda x, y: Number(x != y)
-        self.opers['<='] = lambda x, y: Number(x <= y)
-        self.opers['>='] = lambda x, y: Number(x >= y)
-        self.opers['||'] = lambda x, y: Number(x or y)
-        self.opers['&&'] = lambda x, y: Number(x and y)
-        self.opers['<'] = lambda x, y: Number(x < y)
-        self.opers['>'] = lambda x, y: Number(x > y)
+        self.opers['=='] = lambda x, y: Number(int(x == y))
+        self.opers['!='] = lambda x, y: Number(int(x != y))
+        self.opers['<='] = lambda x, y: Number(int(x <= y))
+        self.opers['>='] = lambda x, y: Number(int(x >= y))
+        self.opers['||'] = lambda x, y: Number(int(x or y))
+        self.opers['&&'] = lambda x, y: Number(int(x and y))
+        self.opers['<'] = lambda x, y: Number(int(x < y))
+        self.opers['>'] = lambda x, y: Number(int(x > y))
 
     def evaluate(self, scope):
         self.lhs = self.lhs_expr.evaluate(scope)
@@ -182,7 +182,7 @@ class UnaryOperation:
         self.expr = expr
         self.op = op
         self.opers = {}
-        self.opers['!'] = lambda x: Number(not x)
+        self.opers['!'] = lambda x: Number(x == Number(0))
         self.opers['-'] = lambda x: -x
 
     def evaluate(self, scope):
@@ -218,6 +218,8 @@ def my_tests():
     Conditional(BinaryOperation(Reference('y'), '>', Reference('x')),
                 [Print(Reference('y'))],
                 [Print(Reference('x'))]).evaluate(scope)
+    print("It should print 1:")
+    Print(BinaryOperation(Number(1), '>', Number(0))).evaluate(scope)
 
 def scope_test():
     scope1 = Scope()
