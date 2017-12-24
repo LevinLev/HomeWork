@@ -166,8 +166,8 @@ class BinaryOperation:
         self.opers['!='] = lambda x, y: Number(int(x != y))
         self.opers['<='] = lambda x, y: Number(int(x <= y))
         self.opers['>='] = lambda x, y: Number(int(x >= y))
-        self.opers['||'] = lambda x, y: Number(int(x or y))
-        self.opers['&&'] = lambda x, y: Number(int(x and y))
+        self.opers['||'] = lambda x, y: Number(int(x.value or y.value))
+        self.opers['&&'] = lambda x, y: Number(int(x.value and y.value))
         self.opers['<'] = lambda x, y: Number(int(x < y))
         self.opers['>'] = lambda x, y: Number(int(x > y))
 
@@ -182,7 +182,7 @@ class UnaryOperation:
         self.expr = expr
         self.op = op
         self.opers = {}
-        self.opers['!'] = lambda x: Number(x == Number(0))
+        self.opers['!'] = lambda x: Number(int(x == Number(0)))
         self.opers['-'] = lambda x: -x
 
     def evaluate(self, scope):
@@ -218,8 +218,15 @@ def my_tests():
     Conditional(BinaryOperation(Reference('y'), '>', Reference('x')),
                 [Print(Reference('y'))],
                 [Print(Reference('x'))]).evaluate(scope)
-    print("It should print 1:")
-    Print(BinaryOperation(Number(1), '>', Number(0))).evaluate(scope)
+    print("It should print 0 (8 times):")
+    Print(BinaryOperation(Number(1), '&&', Number(0))).evaluate(scope)
+    Print(BinaryOperation(Number(0), '||', Number(0))).evaluate(scope)
+    Print(BinaryOperation(Number(1), '-', Number(1))).evaluate(scope)
+    Print(BinaryOperation(Number(-1), '+', Number(1))).evaluate(scope)
+    Print(BinaryOperation(Number(0), '/', Number(10))).evaluate(scope)
+    Print(BinaryOperation(Number(1), '==', Number(0))).evaluate(scope)
+    Print(UnaryOperation('!', Number(12))).evaluate(scope)
+    Print(UnaryOperation('-', Number(0))).evaluate(scope)
 
 def scope_test():
     scope1 = Scope()
