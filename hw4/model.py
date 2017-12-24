@@ -135,10 +135,10 @@ class FunctionCall:
         self.func_args = []
         for op in self.args:
             self.func_args.append(op.evaluate(scope))
-        self.call_scope = Scope(scope)
+        call_scope = Scope(scope)
         for res, arg in list(zip(self.func_args, self.function.args)):
-            self.call_scope[arg] = res
-        return body_evaluate(self.function.body, self.call_scope)
+            call_scope[arg] = res
+        return body_evaluate(self.function.body, call_scope)
 
 
 class Reference:
@@ -154,8 +154,6 @@ class BinaryOperation:
         self.lhs_expr = lhs
         self.rhs_expr = rhs
         self.op = op
-        self.lhs = Number(0)
-        self.rhs = Number(0)
         self.opers = {}
         self.opers['+'] = lambda x, y: x + y
         self.opers['-'] = lambda x, y: x - y
@@ -172,9 +170,9 @@ class BinaryOperation:
         self.opers['>'] = lambda x, y: Number(int(x > y))
 
     def evaluate(self, scope):
-        self.lhs = self.lhs_expr.evaluate(scope)
-        self.rhs = self.rhs_expr.evaluate(scope)
-        return self.opers[self.op](self.lhs, self.rhs)
+        lhs = self.lhs_expr.evaluate(scope)
+        rhs = self.rhs_expr.evaluate(scope)
+        return self.opers[self.op](lhs, rhs)
 
 
 class UnaryOperation:
@@ -186,7 +184,6 @@ class UnaryOperation:
         self.opers['-'] = lambda x: -x
 
     def evaluate(self, scope):
-        num = Number(0)
         num = self.expr.evaluate(scope)
         return self.opers[self.op](num)
 
