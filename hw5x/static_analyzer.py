@@ -79,12 +79,12 @@ class NoReturnValueCheckVisitor:
 
     def visit_cond(self, cond):
         answ = cond.condition.accept(self)
-        answ = self.visit_list(cond.if_true) or answ
-        answ = self.visit_list(cond.if_false) or answ
+        answ = self.visit_body(cond.if_true) or answ
+        answ = self.visit_body(cond.if_false) or answ
         return answ
 
     def visit_function(self, function):
-        return self.visit_list(function.body)
+        return self.visit_body(function.body)
 
     def visit_func_def(self, func_def):
         if func_def.function.accept(self):
