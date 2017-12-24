@@ -5,7 +5,8 @@ class Scope:
 
     def __getitem__(self, name):
         if name not in self.names:
-            return self.parent.names[name]
+            if self.parent:
+                return self.parent.names[name]
         else:
             return self.names[name]
 
@@ -159,7 +160,7 @@ class BinaryOperation:
         self.opers['+'] = lambda x, y: x + y
         self.opers['-'] = lambda x, y: x - y
         self.opers['*'] = lambda x, y: x * y
-        self.opers['/'] = lambda x, y: x / y
+        self.opers['/'] = lambda x, y: x // y
         self.opers['%'] = lambda x, y: x % y
         self.opers['=='] = lambda x, y: Number(x == y)
         self.opers['!='] = lambda x, y: Number(x != y)
