@@ -38,8 +38,8 @@ class PureCheckVisitor:
 
     def visit_cond(self, cond):
         answ = cond.condition.accept(self)
-        answ = answ and self.visit_list(cond.if_true)
-        answ = answ and self.visit_list(cond.if_false)
+        answ = self.visit_list(cond.if_true) and answ
+        answ = self.visit_list(cond.if_false) and answ
         return answ
 
 
@@ -53,6 +53,8 @@ class NoReturnValueCheckVisitor:
         elif len(l) == 0:
             return True
         else:
+            for op in l[:-1]:
+                op.accept(self)
             return l[-1].accept(self)
 
     def visit_number(self, number):
@@ -75,8 +77,8 @@ class NoReturnValueCheckVisitor:
 
     def visit_cond(self, cond):
         answ = cond.condition.accept(self)
-        answ = answ or self.visit_list(cond.if_true)
-        answ = answ or self.visit_list(cond.if_false)
+        answ = self.visit_list(cond.if_true) or answ
+        answ = self.visit_list(cond.if_false) or answ
         return answ
 
     def visit_function(self, function):
