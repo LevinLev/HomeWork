@@ -6,7 +6,7 @@ class Scope:
     def __getitem__(self, name):
         if name not in self.names:
             if self.parent:
-                return self.parent.names[name]
+                return self.parent[name]
         else:
             return self.names[name]
 
@@ -219,6 +219,21 @@ def my_tests():
                 [Print(Reference('y'))],
                 [Print(Reference('x'))]).evaluate(scope)
 
+def scope_test():
+    scope1 = Scope()
+    scope1[1] = 'a'
+    scope2 = Scope(scope1)
+    scope2[2] = 'b'
+    scope3 = Scope(scope2)
+    scope3[3] = 'c'
+    scope4 = Scope(scope3)
+    scope4[4] = 'd'
+    print(scope4[1])
+    print(scope4[2])
+    print(scope4[3])
+    print(scope4[4])
+
 if __name__ == '__main__':
     example()
     my_tests()
+    scope_test()
