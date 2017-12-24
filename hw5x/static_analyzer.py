@@ -90,7 +90,8 @@ class NoReturnValueCheckVisitor:
         return False
 
     def visit_func_call(self, func_call):
+        answ = False
         for op in func_call.args or []:
-            if op.accept(self):
-                return True
-        return False
+            answ = op.accept(self) or answ
+        answ = func_call.fun_expr.accept(self) or answ
+        return answ
