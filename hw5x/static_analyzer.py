@@ -6,6 +6,8 @@ class PureCheckVisitor:
         return prog.accept(self)
 
     def visit_list(self, l):
+        if l is None:
+            return True
         for op in l:
             if not op.accept(self):
                 return False
@@ -42,6 +44,5 @@ class PureCheckVisitor:
     def visit_cond(self, cond):
         answ = cond.condition.accept(self)
         answ = answ and self.visit_list(cond.if_true)
-        if cond.if_false is not None:
-            answ = answ and self.visit_list(cond.if_false)
+        answ = answ and self.visit_list(cond.if_false)
         return answ
