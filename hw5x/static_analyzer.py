@@ -64,15 +64,19 @@ class NoReturnValueCheckVisitor:
         return False
 
     def visit_print(self, printer):
-        return printer.expr.accept(self)
+        printer.expr.accept(self)
+        return False
 
     def visit_ref(self, ref):
         return False
 
     def visit_bin_op(self, bin_op):
+        bin_op.lhs_expr.accept(self)
+        bin_op.rhs_expr.accept(self)
         return False
 
     def visit_un_op(self, un_op):
+        un_op.expr.accept(self)
         return False
 
     def visit_cond(self, cond):
