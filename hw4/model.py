@@ -95,9 +95,9 @@ class Print:
         self.expr = expr
 
     def evaluate(self, scope):
-        ANSW = self.expr.evaluate(scope)
-        print(ANSW.value)
-        return ANSW
+        answ = self.expr.evaluate(scope)
+        print(answ.value)
+        return answ
 
 
 class Read:
@@ -115,12 +115,12 @@ class FunctionCall:
         self.args = args
 
     def evaluate(self, scope):
-        FUNCTION = self.fun_expr.evaluate(scope)
-        FUNC_ARGS = [op.evaluate(scope) for op in self.args]
-        CALL_SCOPE = Scope(scope)
-        for arg_value, arg_name in zip(FUNC_ARGS, FUNCTION.args):
-            CALL_SCOPE[arg_name] = arg_value
-        return body_evaluate(FUNCTION.body, CALL_SCOPE)
+        function = self.fun_expr.evaluate(scope)
+        func_args = [op.evaluate(scope) for op in self.args]
+        call_scope = Scope(scope)
+        for arg_value, arg_name in zip(func_args, function.args):
+            call_scope[arg_name] = arg_value
+        return body_evaluate(function.body, call_scope)
 
 
 class Reference:
@@ -132,13 +132,7 @@ class Reference:
 
 
 class BinaryOperation:
-    def __init__(self, lhs, op, rhs):
-        self.lhs_expr = lhs
-        self.rhs_expr = rhs
-        self.op = op
-
-    def evaluate(self, scope):
-        OPERS = {
+    OPERS = {
             '+': lambda x, y: x + y,
             '-': lambda x, y: x - y,
             '*': lambda x, y: x * y,
@@ -153,23 +147,31 @@ class BinaryOperation:
             '||': lambda x, y: Number(x.value or y.value),
             '&&': lambda x, y: Number(x.value and y.value)
                 }
-        LHS = self.lhs_expr.evaluate(scope)
-        RHS = self.rhs_expr.evaluate(scope)
-        return OPERS[self.op](LHS, RHS)
+
+    def __init__(self, lhs, op, rhs):
+        self.lhs_expr = lhs
+        self.rhs_expr = rhs
+        self.op = op
+
+    def evaluate(self, scope):
+        lhs = self.lhs_expr.evaluate(scope)
+        rhs = self.rhs_expr.evaluate(scope)
+        return self.OPERS[self.op](lhs, rhs)
 
 
 class UnaryOperation:
+    OPERS = {
+            '!': lambda x: Number(int(x == Number(0))),
+            '-': lambda x: -x
+                }
+
     def __init__(self, op, expr):
         self.expr = expr
         self.op = op
 
     def evaluate(self, scope):
-        OPERS = {
-            '!': lambda x: Number(int(x == Number(0))),
-            '-': lambda x: -x
-                }
-        NUM = self.expr.evaluate(scope)
-        return OPERS[self.op](NUM)
+        num = self.expr.evaluate(scope)
+        return self.OPERS[self.op](num)
 
 
 def example():
