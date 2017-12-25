@@ -132,21 +132,21 @@ class Reference:
 
 
 class BinaryOperation:
-    OPERS = {
-            '+': lambda x, y: x + y,
-            '-': lambda x, y: x - y,
-            '*': lambda x, y: x * y,
-            '%': lambda x, y: x % y,
-            '/': lambda x, y: x // y,
-            '<': lambda x, y: Number(int(x < y)),
-            '>': lambda x, y: Number(int(x > y)),
-            '==': lambda x, y: Number(int(x == y)),
-            '!=': lambda x, y: Number(int(x != y)),
-            '<=': lambda x, y: Number(int(x <= y)),
-            '>=': lambda x, y: Number(int(x >= y)),
-            '||': lambda x, y: Number(x.value or y.value),
-            '&&': lambda x, y: Number(x.value and y.value)
-                }
+    OPS = {
+      '+': lambda x, y: x + y,
+      '-': lambda x, y: x - y,
+      '*': lambda x, y: x * y,
+      '%': lambda x, y: x % y,
+      '/': lambda x, y: x // y,
+      '<': lambda x, y: Number(int(x < y)),
+      '>': lambda x, y: Number(int(x > y)),
+      '==': lambda x, y: Number(int(x == y)),
+      '!=': lambda x, y: Number(int(x != y)),
+      '<=': lambda x, y: Number(int(x <= y)),
+      '>=': lambda x, y: Number(int(x >= y)),
+      '||': lambda x, y: Number(x.value or y.value),
+      '&&': lambda x, y: Number(x.value and y.value)
+            }
 
     def __init__(self, lhs, op, rhs):
         self.lhs_expr = lhs
@@ -156,14 +156,14 @@ class BinaryOperation:
     def evaluate(self, scope):
         lhs = self.lhs_expr.evaluate(scope)
         rhs = self.rhs_expr.evaluate(scope)
-        return self.OPERS[self.op](lhs, rhs)
+        return self.OPS[self.op](lhs, rhs)
 
 
 class UnaryOperation:
-    OPERS = {
-            '!': lambda x: Number(int(x == Number(0))),
-            '-': lambda x: -x
-                }
+    OPS = {
+      '!': lambda x: Number(int(x == Number(0))),
+      '-': lambda x: -x
+            }
 
     def __init__(self, op, expr):
         self.expr = expr
@@ -171,7 +171,7 @@ class UnaryOperation:
 
     def evaluate(self, scope):
         num = self.expr.evaluate(scope)
-        return self.OPERS[self.op](num)
+        return self.OPS[self.op](num)
 
 
 def example():
@@ -188,6 +188,7 @@ def example():
     print('It should print 2: ', end=' ')
     FunctionCall(FunctionDefinition('foo', parent['foo']),
                  [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope)
+
 
 def my_tests():
     scope = Scope()
@@ -211,6 +212,7 @@ def my_tests():
     Print(UnaryOperation('!', Number(12))).evaluate(scope)
     Print(UnaryOperation('-', Number(0))).evaluate(scope)
 
+
 def scope_test():
     scope1 = Scope()
     scope1[1] = 'a'
@@ -225,6 +227,7 @@ def scope_test():
     print(scope4[2])
     print(scope4[3])
     print(scope4[4])
+
 
 if __name__ == '__main__':
     example()
