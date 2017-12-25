@@ -84,8 +84,7 @@ class Conditional:
         self.if_false = if_false
 
     def evaluate(self, scope):
-        CONDITION = self.condition.evaluate(scope)
-        if CONDITION == Number(0):
+        if self.condition.evaluate(scope) == Number(0):
             return body_evaluate(self.if_false, scope)
         else:
             return body_evaluate(self.if_true, scope)
