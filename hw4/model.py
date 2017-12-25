@@ -146,7 +146,7 @@ class BinaryOperation:
       '>=': lambda x, y: Number(int(x >= y)),
       '||': lambda x, y: Number(x.value or y.value),
       '&&': lambda x, y: Number(x.value and y.value)
-            }
+    }
 
     def __init__(self, lhs, op, rhs):
         self.lhs_expr = lhs
@@ -163,7 +163,7 @@ class UnaryOperation:
     OPS = {
       '!': lambda x: Number(int(x == Number(0))),
       '-': lambda x: -x
-            }
+    }
 
     def __init__(self, op, expr):
         self.expr = expr
