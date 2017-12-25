@@ -5,8 +5,7 @@ class Scope:
 
     def __getitem__(self, name):
         if name not in self.names:
-            if self.parent:
-                return self.parent[name]
+            return self.parent[name]
         else:
             return self.names[name]
 
@@ -15,10 +14,10 @@ class Scope:
 
 
 def body_evaluate(body, scope):
-    for op in body[:-1]:
-        op.evaluate(scope)
-    if body:
-        return body[-1].evaluate(scope)
+    result = Number(0)
+    for op in body or []:
+        result = op.evaluate(scope)
+    return result
 
 
 class Number:
@@ -37,9 +36,6 @@ class Number:
     def __le__(self, other):
         return self.value <= other.value
 
-    def __ge__(self, other):
-        return self.value >= other.value
-
     def __add__(self, other):
         return Number(self.value + other.value)
 
@@ -54,12 +50,6 @@ class Number:
 
     def __mod__(self, other):
         return Number(self.value % other.value)
-
-    def __and__(self, other):
-        return self.value and self.value
-
-    def __or__(self, other):
-        return self.value or self.value
 
     def __neg__(self):
         return Number(0) - self
@@ -94,26 +84,21 @@ class Conditional:
         self.if_false = if_false
 
     def evaluate(self, scope):
-        condition = self.condition.evaluate(scope)
-        if condition == Number(0):
-            if self.if_false:
-                return body_evaluate(self.if_false, scope)
-            else:
-                return Number(0)
+        CONDITION = self.condition.evaluate(scope)
+        if CONDITION == Number(0):
+            return body_evaluate(self.if_false, scope)
         else:
-            if self.if_true:
-                return body_evaluate(self.if_true, scope)
-            else:
-                return Number(0)
+            return body_evaluate(self.if_true, scope)
+
 
 class Print:
     def __init__(self, expr):
         self.expr = expr
 
     def evaluate(self, scope):
-        answ = self.expr.evaluate(scope)
-        print(answ.value)
-        return answ
+        ANSW = self.expr.evaluate(scope)
+        print(ANSW.value)
+        return ANSW
 
 
 class Read:
@@ -131,14 +116,12 @@ class FunctionCall:
         self.args = args
 
     def evaluate(self, scope):
-        self.function = self.fun_expr.evaluate(scope)
-        self.func_args = []
-        for op in self.args:
-            self.func_args.append(op.evaluate(scope))
-        call_scope = Scope(scope)
-        for res, arg in list(zip(self.func_args, self.function.args)):
-            call_scope[arg] = res
-        return body_evaluate(self.function.body, call_scope)
+        FUNCTION = self.fun_expr.evaluate(scope)
+        FUNC_ARGS = [op.evaluate(scope) for op in self.args]
+        CALL_SCOPE = Scope(scope)
+        for arg_value, arg_name in zip(FUNC_ARGS, FUNCTION.args):
+            CALL_SCOPE[arg_name] = arg_value
+        return body_evaluate(FUNCTION.body, CALL_SCOPE)
 
 
 class Reference:
@@ -154,38 +137,40 @@ class BinaryOperation:
         self.lhs_expr = lhs
         self.rhs_expr = rhs
         self.op = op
-        self.opers = {}
-        self.opers['+'] = lambda x, y: x + y
-        self.opers['-'] = lambda x, y: x - y
-        self.opers['*'] = lambda x, y: x * y
-        self.opers['/'] = lambda x, y: x // y
-        self.opers['%'] = lambda x, y: x % y
-        self.opers['=='] = lambda x, y: Number(int(x == y))
-        self.opers['!='] = lambda x, y: Number(int(x != y))
-        self.opers['<='] = lambda x, y: Number(int(x <= y))
-        self.opers['>='] = lambda x, y: Number(int(x >= y))
-        self.opers['||'] = lambda x, y: Number(int(x.value or y.value))
-        self.opers['&&'] = lambda x, y: Number(int(x.value and y.value))
-        self.opers['<'] = lambda x, y: Number(int(x < y))
-        self.opers['>'] = lambda x, y: Number(int(x > y))
 
     def evaluate(self, scope):
-        lhs = self.lhs_expr.evaluate(scope)
-        rhs = self.rhs_expr.evaluate(scope)
-        return self.opers[self.op](lhs, rhs)
+        OPERS = {
+            '+': lambda x, y: x + y,
+            '-': lambda x, y: x - y,
+            '*': lambda x, y: x * y,
+            '%': lambda x, y: x % y,
+            '/': lambda x, y: x // y,
+            '<': lambda x, y: Number(int(x < y)),
+            '>': lambda x, y: Number(int(x > y)),
+            '==': lambda x, y: Number(int(x == y)),
+            '!=': lambda x, y: Number(int(x != y)),
+            '<=': lambda x, y: Number(int(x <= y)),
+            '>=': lambda x, y: Number(int(x >= y)),
+            '||': lambda x, y: Number(x.value or y.value),
+            '&&': lambda x, y: Number(x.value and y.value)
+                }
+        LHS = self.lhs_expr.evaluate(scope)
+        RHS = self.rhs_expr.evaluate(scope)
+        return OPERS[self.op](LHS, RHS)
 
 
 class UnaryOperation:
     def __init__(self, op, expr):
         self.expr = expr
         self.op = op
-        self.opers = {}
-        self.opers['!'] = lambda x: Number(int(x == Number(0)))
-        self.opers['-'] = lambda x: -x
 
     def evaluate(self, scope):
-        num = self.expr.evaluate(scope)
-        return self.opers[self.op](num)
+        OPERS = {
+            '!': lambda x: Number(int(x == Number(0))),
+            '-': lambda x: -x
+                }
+        NUM = self.expr.evaluate(scope)
+        return OPERS[self.op](NUM)
 
 
 def example():
@@ -234,6 +219,7 @@ def scope_test():
     scope3[3] = 'c'
     scope4 = Scope(scope3)
     scope4[4] = 'd'
+    print("It should print 'abcd'")
     print(scope4[1])
     print(scope4[2])
     print(scope4[3])
